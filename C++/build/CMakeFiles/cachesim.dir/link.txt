@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wall -Werror -Wpedantic -Wpointer-arith -Wsign-conversion -Wconversion -pedantic-errors -g  -rdynamic CMakeFiles/cachesim.dir/cache_driver.cpp.o CMakeFiles/cachesim.dir/cache.cpp.o  -o cachesim 
