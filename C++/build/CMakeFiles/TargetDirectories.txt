@@ -1,4 +1,0 @@
-/home/danbudanov/Documents/git/4100_Project1/C++/build/CMakeFiles/rebuild_cache.dir
-/home/danbudanov/Documents/git/4100_Project1/C++/build/CMakeFiles/edit_cache.dir
-/home/danbudanov/Documents/git/4100_Project1/C++/build/CMakeFiles/cachesim.dir
-/home/danbudanov/Documents/git/4100_Project1/C++/build/CMakeFiles/submit.dir
