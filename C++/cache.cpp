@@ -35,9 +35,6 @@ inline uint64_t clog2(uint64_t num)
     return static_cast<uint64_t>(std::ceil(std::log2(num)));
 }
 
-
-
-
 /**
  * @brief Object representing entry in a cache
  */
@@ -261,7 +258,7 @@ class CacheEntry
             return b;
         }
 
-        uint64_t gets() const
+        uint64_t getS() const
         {
             return s;
         }
@@ -475,7 +472,29 @@ class LruSet : public CacheSet
         }
 
         /**
-         * @brief Attempt to writeback to LRU
+         * @brief Attempt to writeback to LRU set without setting RU order
+         *
+         * If a hit, mark block dirty and return copy of wb cache
+         * !!! DO NOT SET AS MRU IN L2!!!
+         * If a miss, return blank
+         */
+        CacheEntry writeBackNoRU(uint64_t tag)
+        {
+            auto foundEntryIt = std::find(this->set.begin(), this->set.end(), 
+                    tag);
+            if (foundEntryIt == this->set.end()) { // entry not found
+                return CacheEntry();
+            } else {
+                foundEntryIt->setDirty(true);
+                CacheEntry dirtyEntry = *foundEntryIt;
+                // this->set.remove(newMru);
+                // set.push_front(newMru);
+                return dirtyEntry;
+            }
+        }
+
+        /**
+         * @brief Attempt to writeback to LRU setting RU order
          *
          * If a hit, mark block dirty and return copy of wb cache
          * If a miss, return blank
@@ -541,6 +560,9 @@ class VictimSet : public CacheSet
 
         /**
          * Insert entry into VictimSet
+         *
+         * If a member of the victim cache is evicted, return its value,
+         * otherwise return blank
          */
         CacheEntry insert(CacheEntry entry)
         {
@@ -548,11 +570,11 @@ class VictimSet : public CacheSet
                 this->set.push_front(entry);
                 return CacheEntry();
             } else { // have to evict the FIFO entry (at tail of cache)
-                // Copy value of FIFO entry
-                CacheEntry fifo = this->set.back();
+                // Copy value of FIFO output entry
+                CacheEntry fifoOut = this->set.back();
                 this->set.pop_back();
                 this->set.push_front(entry);
-                return fifo;
+                return fifoOut;
             }
         }
 
@@ -662,11 +684,68 @@ class Prefetcher
             return eviction;
         }
 
-        bool checkEmpty()
+        bool isEmpty()
         {
             return (evictions.empty());
         }
 }; // Prefetcher
+
+/**
+ * @brief Converts given CacheEntry into a specified set's (C,S,B) dimensions
+ */
+inline CacheEntry convertDims(CacheEntry entry, const CacheSet& set)
+{
+    return CacheEntry(entry, set.getC(), set.getB(), set.getS());
+}
+
+/**
+ * @brief procedure to insert block from L2 into L1
+ *
+ * L1, L2, and the Victim Cache are affected.
+ *
+ * @return a blank CE if everything was a success. Return populated CE if 
+ * eviction to memory occurred
+ */
+inline CacheEntry insertL1FromL2(CacheEntry l2Entry, LruSet& l1, LruSet& l2, 
+        VictimSet& vc)
+{
+    auto l1Evicted = l1.insertMru(l2Entry);
+
+
+    if(l1Evicted.isBlank()) { // nothing evicted from L1; improbable
+        return CacheEntry();
+    }
+ 
+    // Convert to VC dimensions
+    l1Evicted = convertDims(l1Evicted, vc);
+
+    auto vcEvicted = vc.insert(l1Evicted);
+
+    if(vcEvicted.isBlank()) { // nothing evicted from vc; improbable
+        return CacheEntry();
+    }
+
+    if(vcEvicted.isDirty()) { // if clean entry evicted from VC, can discard
+        return CacheEntry();
+    } else { // Dirty, so need to update L2 writeback accordingly
+        // Update to L2 format
+        vcEvicted = convertDims(vcEvicted, l2);
+        // Writeback returns written CacheEntry if found, blank CE if not
+        auto l2Writeback = l2.writeBackNoRU(vcEvicted);
+        // If nonblank, then successfully wrote a dirty bit, can return blank
+        if (!l2Writeback.isBlank()) return CacheEntry();
+
+        // If did find that block in L2 set, then 
+        l2Writeback = l2.insertLru(vcEvicted);
+        // Return block evicted from L2
+        return l2Writeback;
+    }
+}
+
+
+
+
+
 
 /**
  * Globals used in actual simulation
@@ -746,6 +825,27 @@ void cache_init(struct cache_config_t *conf)
  */
 void cache_access(uint64_t addr, char rw, struct cache_stats_t *stats)
 {
+    bool isWrite = (rw == 'w');
+
+    stats->num_accesses++;
+    if(isWrite) {
+        stats->num_accesses_writes++;
+    } else {
+        stats->num_accesses_reads++;
+    }
+
+    auto l1Entry = CacheEntry(addr, isWrite, L1_C, B, L1_S);
+    l1Entry.setDirty(isWrite);
+
+    if (isWrite) {
+        l1EntryReturn = l1.writeBack(l1Entry.getTag());
+    } else {
+        l1EntryReturn = l1.read(l1Entry.getTag);
+    }
+
+
+
+
 }
 
 /** @brief Function to free any allocated memory and finalize statistics

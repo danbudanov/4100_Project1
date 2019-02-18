@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++
+CMAKE_SOURCE_DIR = /home/danbudanov/Documents/git/4100_Project1/C++
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/build
+CMAKE_BINARY_DIR = /home/danbudanov/Documents/git/4100_Project1/C++/build
 
 # Utility rule file for submit.
 
@@ -55,7 +55,7 @@ include CMakeFiles/submit.dir/progress.make
 
 CMakeFiles/submit:
 	/usr/bin/cmake -E make_directory submit
-	/usr/bin/cmake -E copy /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/cache_driver.cpp /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/cache.cpp /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/cache.hpp /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/CMakeLists.txt /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/*.pdf submit
+	/usr/bin/cmake -E copy /home/danbudanov/Documents/git/4100_Project1/C++/cache_driver.cpp /home/danbudanov/Documents/git/4100_Project1/C++/cache.cpp /home/danbudanov/Documents/git/4100_Project1/C++/cache.hpp /home/danbudanov/Documents/git/4100_Project1/C++/CMakeLists.txt /home/danbudanov/Documents/git/4100_Project1/C++/*.pdf submit
 	/usr/bin/cmake -E tar cvzf project1_submit.tar.gz submit
 	/usr/bin/cmake -E remove_directory submit
 
@@ -74,6 +74,6 @@ CMakeFiles/submit.dir/clean:
 .PHONY : CMakeFiles/submit.dir/clean
 
 CMakeFiles/submit.dir/depend:
-	cd /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++ /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++ /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/build /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/build /home/danbudanov/Documents/4100/4100_Project1/4100_Project1/C++/build/CMakeFiles/submit.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/danbudanov/Documents/git/4100_Project1/C++/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/danbudanov/Documents/git/4100_Project1/C++ /home/danbudanov/Documents/git/4100_Project1/C++ /home/danbudanov/Documents/git/4100_Project1/C++/build /home/danbudanov/Documents/git/4100_Project1/C++/build /home/danbudanov/Documents/git/4100_Project1/C++/build/CMakeFiles/submit.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/submit.dir/depend
 
